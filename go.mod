@@ -1,4 +1,4 @@
-module gpt-3-encoder
+module github.com/Code-Hex/go-gpt-3-encode
 
 go 1.18
 
