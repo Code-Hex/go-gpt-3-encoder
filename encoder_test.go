@@ -454,11 +454,40 @@ func TestNewEncoder_encode(t *testing.T) {
 	is.EqualValues(want, got)
 	is.Nil(err)
 
-	// @TODO
-	// want = []int{31373, 50169, 233, 995, 12520, 234, 235, 770, 318, 257, 890, 4731, 284, 1332, 1771, 393, 407, 262, 44805, 2071, 373, 5969, 0}
-	// got, err = encoder.Encode("hello 👋 world 🌍 This is a long string to test whether or not the emoji issue was fixed!")
-	// is.EqualValues(want, got)
-	// is.Nil(err)
+	tests := []struct {
+		prompt string
+		want   int
+	}{
+		{
+			prompt: "Hello, World",
+			want:   3,
+		},
+		{
+			prompt: "こんにちは。これはテストです。",
+			want:   15,
+		},
+		{
+			prompt: "Hello, これはテストっぽいテストです :bow: 😇",
+			want:   21,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.prompt, func(t *testing.T) {
+			tokens, err := encoder.Encode(tt.prompt)
+			if err != nil {
+				t.Fatal(err)
+			}
+			got := len(tokens)
+			if got != tt.want {
+				t.Errorf("encoder.Encode() = tokens(%v), want %v", got, tt.want)
+			}
+		})
+	}
+
+	want = []int{31373, 50169, 233, 995, 12520, 234, 235, 770, 318, 257, 890, 4731, 284, 1332, 1771, 393, 407, 262, 44805, 2071, 373, 5969, 0}
+	got, err = encoder.Encode("hello 👋 world 🌍 This is a long string to test whether or not the emoji issue was fixed!")
+	is.EqualValues(want, got)
+	is.Nil(err)
 }
 
 func TestNewEncoder_decode(t *testing.T) {
